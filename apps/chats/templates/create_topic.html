@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать тему</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+    <h1>Создать тему</h1>
+
+    <form id="createTopicForm" method="post" action="{% url 'chats:create_topic' %}">
+        {% csrf_token %}
+        
+        <label for="create_topic">Создать тему:</label>
+        <input type="text" id="create_topic" name="create_topic" value="{{ create_topic }}">
+        
+        <button type="button" onclick="submitForm()">создать</button>
+    </form>
+
+    <div id="topicList">
+        <!-- Здесь будет отображаться список созданных тем -->
+    </div>
+            
+    <script>
+        function submitForm() {
+            var formData = $('#createTopicForm').serialize();
+            
+            $.ajax({
+                type: 'POST',
+                url: '{% url "chats:create_topic" %}',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+
+                    // При успешном ответе добавляем созданную тему в список как ссылку
+                    $('#topicList').append('<p><a href="{% url "chats:chat_room" room_name=' + response.create_topic + ' %}">' + response.create_topic + '</a></p>');
+                },
+                error: function(error) {
+                    console.error(error);
+                    alert('Произошла ошибка при создании темы.');
+                }
+            });
+        }
+    </script>
+    
+    
+
+</body>
+</html>

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(messageInput.value);
             websocketClient.send(messageInput.value);
             messageInput.value = '';
-            
+           
         };
     };
 
