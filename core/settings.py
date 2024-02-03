@@ -66,6 +66,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 TEMPLATES = [
     {
@@ -192,7 +197,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [('127.0.0.1', 6379)],
-        },
+        },  
     },
 }
 TEMPLATES = [

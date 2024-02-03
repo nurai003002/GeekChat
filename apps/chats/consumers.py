@@ -45,3 +45,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message
         }))
+
+        
+# Пример consumer.py для Django Channels
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .views import save_chat_message
+
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        pass
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        room_name = data['room_name']
+        sender = data['sender']
+        content = data['content']
+
+        # Сохранение в базу данных
+        save_chat_message(room_name, sender, content)
+
+        # Отправка сообщения другим подписчикам
+        await self.send(text_data=json.dumps({
+            'sender': sender,
+            'content': content
+        }))

@@ -11,7 +11,7 @@ services:
       - .env
     depends_on:
       - postgres-db
-    command: /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+    command: /bin/sh -c "python manage.py migrate && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"
     networks:
       - dockernet
 

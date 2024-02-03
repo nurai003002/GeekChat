@@ -1,17 +1,16 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
 
-from .models import Message,Rooms
-from .serializers import RoomSerializer,BackMessageSerializer,FrontMessageSerializer,UXUIMessageSerializer,AndroidMessageSerializer
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.views.generic import TemplateView
+from django.http import JsonResponse
+from django.views import View
+from django.shortcuts import render
 
-class BackListViewSet(GenericViewSet,
-                      mixins.ListModelMixin,
-                      mixins.CreateModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      mixins.DestroyModelMixin):
-    queryset = Message.objects.all()
-    serializer_class = BackMessageSerializer
+from apps.chats.models import ChatMessage,Rooms
+from .serializers import RoomSerializer, ChatMessageserializer
+
 
 class RoomsListViewSet(GenericViewSet,
                       mixins.ListModelMixin,
@@ -22,39 +21,16 @@ class RoomsListViewSet(GenericViewSet,
     queryset = Rooms.objects.all()
     serializer_class = RoomSerializer
 
-# class FrontListViewSet(GenericViewSet,
-#                       mixins.ListModelMixin,
-#                       mixins.CreateModelMixin,
-#                       mixins.RetrieveModelMixin,
-#                       mixins.UpdateModelMixin,
-#                       mixins.DestroyModelMixin):
-#     queryset = Message.objects.all()
-#     serializer_class = FrontMessageSerializer
+class ChatMessageView(GenericViewSet,
+                      mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.DestroyModelMixin):
+    queryset = ChatMessage.objects.all()
+    serializer_class = ChatMessageserializer
 
-# class UxUiListViewSet(GenericViewSet,
-#                       mixins.ListModelMixin,
-#                       mixins.CreateModelMixin,
-#                       mixins.RetrieveModelMixin,
-#                       mixins.UpdateModelMixin,
-#                       mixins.DestroyModelMixin):
-#     queryset = Message.objects.all()
-#     serializer_class = UXUIMessageSerializer
-
-# class AndroidListViewSet(GenericViewSet,
-#                       mixins.ListModelMixin,
-#                       mixins.CreateModelMixin,
-#                       mixins.RetrieveModelMixin,
-#                       mixins.UpdateModelMixin,
-#                       mixins.DestroyModelMixin):
-#     queryset = Message.objects.all()
-#     serializer_class = AndroidMessageSerializer
-
-
-# views.py
-from django.views.generic import TemplateView
-from django.http import JsonResponse
-from django.views import View
-from django.shortcuts import render,redirect
+    def save_chat_message(room_name, sender, content):
+        message = ChatMessage(room_name=room_name, sender=sender, content=content)
+        message.save()
 
 class ChatRoomView(TemplateView):
     template_name = 'chat_room.html'
@@ -71,8 +47,7 @@ class ChatRoomView(TemplateView):
         response_data = {'status': 'success', 'create_topic': create_topic}
         return JsonResponse(response_data)
 
-    
-
+        
 
 class CreateTopicView(View):
     template_name = 'create_topic.html'
@@ -85,3 +60,7 @@ class CreateTopicView(View):
 
         response_data = {'status': 'success', 'create_topic': create_topic}
         return JsonResponse(response_data)
+
+
+    
+
